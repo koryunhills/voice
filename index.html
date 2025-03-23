@@ -8,12 +8,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 </head>
 <body>
-    <select id="audioSource" class="audio-select"></select>
-    <div id="animation-container"></div>
-    <div class="controls">
+<div class="container">
+    <div class="selector-container">
+        <select id="audioSource" class="selector"></select>
+        <select id="animationSelect" class="selector"></select>
         <button id="startBtn">Start</button>
         <button id="stopBtn" disabled>Stop</button>
     </div>
+    <div id="animation-container"></div>
+    
+</div>
     <script src="script.js"></script>
 </body>
 </html> 
