@@ -22,11 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSpeed = minSpeed;
 
     // Populate animation selector
-    const animations = ['listening1.json', 'listening2.json', 'soundwave.json', 'blueOrb'];
+    const animations = ['listening1.json', 'listening2.json'];
     animations.forEach(anim => {
         const option = document.createElement('option');
         option.value = anim;
-        option.text = anim === 'blueOrb' ? 'Blue Orb' : anim.replace('.json', '');
+        option.text = anim.replace('.json', '');
         animationSelect.appendChild(option);
     });
 
@@ -36,50 +36,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to load animations
     function loadAnimation(animationType) {
         currentAnimationType = animationType;
-        
-        if (animationType === 'blueOrb') {
-            if (animation) {
-                animation.destroy();
-                animation = null;
-            }
-            createBlueOrb();
-            isBlueOrbActive = true;
-        } else {
-            isBlueOrbActive = false;
-            if (animation) {
-                animation.destroy();
-            }
-            animation = lottie.loadAnimation({
-                container: animationContainer,
-                renderer: 'svg',
-                loop: true,
-                autoplay: false,
-                path: animationType
-            });
+        if (animation) {
+            animation.destroy();
         }
-    }
-
-    // Function to create blue orb SVG
-    function createBlueOrb() {
-        const svgNS = "http://www.w3.org/2000/svg";
-        animationContainer.innerHTML = '';
-        
-        // Create the SVG element
-        const svg = document.createElementNS(svgNS, "svg");
-        svg.setAttribute("width", "100%");
-        svg.setAttribute("height", "100%");
-        svg.setAttribute("viewBox", "0 0 200 200");
-        animationContainer.appendChild(svg);
-        
-        // Create the blue orb (circle)
-        const circle = document.createElementNS(svgNS, "circle");
-        circle.setAttribute("cx", "100");
-        circle.setAttribute("cy", "100");
-        circle.setAttribute("r", "50");
-        circle.setAttribute("fill", "#0066ff");
-        circle.setAttribute("id", "blueOrb");
-        
-        svg.appendChild(circle);
+        animation = lottie.loadAnimation({
+            container: animationContainer,
+            renderer: 'svg',
+            loop: true,
+            autoplay: false,
+            path: animationType
+        });
     }
 
     // Handle animation type change
@@ -89,8 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Process audio for Lottie animations
-    function processLottieAudio() {
+    // Process audio for animations
+    function processAudio() {
         const array = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(array);
         
@@ -111,36 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!animation.isPaused) {
                 animation.pause();
             }
-        }
-    }
-
-    // Process audio for Blue Orb visualization
-    function processBlueOrbAudio() {
-        const array = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(array);
-        
-        const circle = document.getElementById('blueOrb');
-        if (!circle) return;
-        
-        // Calculate overall volume - this is the raw volume without averaging
-        const volume = array.reduce((a, b) => a + b, 0);
-        
-        // Direct scaling with maximum responsiveness
-        const baseRadius = 50;
-        const maxRadius = 120;
-        const volumeRatio = volume / (128 * array.length);
-        const newRadius = baseRadius + (volumeRatio * (maxRadius - baseRadius));
-        
-        // Apply the radius directly without any smoothing
-        circle.setAttribute("r", newRadius);
-    }
-
-    // General audio processing function
-    function processAudio() {
-        if (isBlueOrbActive) {
-            processBlueOrbAudio();
-        } else if (animation) {
-            processLottieAudio();
         }
     }
 
