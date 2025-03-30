@@ -11,8 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let microphone;
     let javascriptNode;
     let animation;
-    let currentAnimationType = 'listening1.json';
-    let isBlueOrbActive = false;
+    let currentAnimationType = 'version1';
 
     // Animation settings
     const minSpeed = 0.001;
@@ -22,11 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSpeed = minSpeed;
 
     // Populate animation selector
-    const animations = ['listening1.json', 'listening2.json'];
+    const animations = ['version1', 'version2', 'version3', 'version4', 'version5'];
     animations.forEach(anim => {
         const option = document.createElement('option');
         option.value = anim;
-        option.text = anim.replace('.json', '');
+        option.text = anim;
         animationSelect.appendChild(option);
     });
 
@@ -39,13 +38,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (animation) {
             animation.destroy();
         }
-        animation = lottie.loadAnimation({
-            container: animationContainer,
-            renderer: 'svg',
-            loop: true,
-            autoplay: false,
-            path: animationType
-        });
+        try {
+            animation = lottie.loadAnimation({
+                container: animationContainer,
+                renderer: 'svg',
+                loop: true,
+                autoplay: false,
+                path: `${animationType}.json`
+            });
+
+            animation.addEventListener('error', (error) => {
+                console.error('Error loading animation:', error);
+                alert(`Error loading animation ${animationType}. Please check if the file exists.`);
+            });
+        } catch (error) {
+            console.error('Error initializing animation:', error);
+            alert('Error initializing animation. Please check the console for details.');
+        }
     }
 
     // Handle animation type change
@@ -139,11 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Start processing audio
             javascriptNode.onaudioprocess = processAudio;
             
-            // Start animation if it's a Lottie animation
-            if (!isBlueOrbActive && animation) {
-                animation.play();
-            }
-            
             // Update UI
             startBtn.disabled = true;
             stopBtn.disabled = false;
@@ -165,8 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (analyser) analyser.disconnect();
         if (audioContext) audioContext.close();
 
-        // Stop animation if it's a Lottie animation
-        if (!isBlueOrbActive && animation) {
+        // Stop animation
+        if (animation) {
             animation.pause();
         }
 
